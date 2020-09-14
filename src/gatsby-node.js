@@ -47,6 +47,7 @@ exports.sourceNodes = async (
   if (result.data) {
     result.data.forEach((employee) => {
         let attributes = employee.attributes;
+        log(attributes);
         
         let newEmployeeNode = {
             id: createNodeId(`employee-${attributes.id.value.toString()}`),
@@ -58,7 +59,8 @@ exports.sourceNodes = async (
             first_name: attributes.first_name.value,
             last_name: attributes.last_name.value,
             position: attributes.position.value,
-            profile_picture: attributes.profile_picture.value
+            profile_picture: attributes.profile_picture.value,
+            status: attributes.status.value
         };
         
         createNode(newEmployeeNode);
