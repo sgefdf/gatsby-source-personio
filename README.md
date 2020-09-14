@@ -1,6 +1,6 @@
-# gatsby-source-starter
+# gatsby-source-personio
 
-This is a starter plugin for building a Gatsby JS Source Plugin. It helps to update this as you go.
+This is a source plugin for fetching employees list from the Personio API
 
 ## Set The Config
 
@@ -10,8 +10,11 @@ In `gatsby-config.js`:
 module.exports = {
     plugins: [
         {
-            resolve: 'gatsby-source-starter',
-            options: {},
+            resolve: 'gatsby-source-personio',
+            options: {
+                clientId: 'YOUR_ID',
+                clientSecret: 'YOUR_SECRET'
+            },
         },
     ],
 }

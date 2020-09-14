@@ -1,15 +1,17 @@
 {
-  "name": "gatsby-source-starter",
-  "description": "Gatsby JS source plugin starter. To jump start your plugin build.",
-  "version": "0.0.1",
-  "author": "Robert Marshall (https://robertmarshall.dev)",
+  "name": "gatsby-source-personio",
+  "description": "Gatsby JS source plugin for Personio employees API",
+  "version": "1.0.0",
+  "author": "Alexandre Courtiol",
   "dependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/runtime": "^7.4.5",
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/runtime": "^7.11.2",
     "babel-preset-env": "^1.7.0",
-    "babel-preset-gatsby-package": "^0.1.4"
+    "babel-preset-gatsby-package": "^0.5.2",
+    "chalk": "^4.1.0",
+    "node-fetch": "^2.6.1"
   },
   "keywords": [
     "gatsby",
@@ -18,19 +20,19 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/robmarshall/gatsby-source-starter.git"
+    "url": "https://github.com/sgefdf/gatsby-source-personio.git"
   },
   "devDependencies": {
-    "cross-env": "^5.2.0",
+    "cross-env": "^7.0.2",
     "install-peers": "^1.0.3"
   },
   "license": "MIT",
   "scripts": {
     "build": "babel src --out-dir .",
-    "prepare": "cross-env NODE_ENV=production npm run build",
+    "prepare": "cross-env NODE_ENV=production yarn build",
     "watch": "babel -w src --out-dir ."
   },
   "peerDependencies": {
-    "gatsby": ">2.0.15"
+    "gatsby": "^2"
   }
 }

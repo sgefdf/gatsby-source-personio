@@ -1,23 +1,69 @@
-const {
-    flattenArray,
-    getCurrentTimestamp,
-    isArray,
-    isObject,
-    isObjEmpty,
-} = require('./utils/helpers')
-
-// Set the current active enviroment
-let activeEnv =
-    process.env.GATSBY_ACTIVE_ENV || process.env.NODE_ENV || 'development'
-
-// If we are in dev, ignore the fact that we may be using a fake SSL certificate
-if (activeEnv == 'development') {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-}
+const fetch = require("node-fetch");
+const chalk = require("chalk");
+const log = console.log;
 
 exports.sourceNodes = async (
-    { actions: { createNode }, createContentDigest, createNodeId },
-    { plugins }
+  { actions: { createNode }, createContentDigest, createNodeId },
+  { api }
 ) => {
-    // Do your stuff!
-}
+  log(chalk.black.bgWhite("Starting Personio Source plugin"));
+
+  if (!api) {
+    log(
+      chalk.bgRed("You seem to be missing API details in your gatsby-config.js")
+    );
+    return;
+  }
+
+  let auth;
+
+  try {
+    let response = await fetch(
+      `https://api.personio.de/v1/auth?client_id=${api.clientId}&client_secret=${api.clientSecret}`,
+      {
+        method: "POST",
+        headers: { accept: "application/json" },
+      }
+    );
+    auth = await response.json();
+  } catch (err) {
+    log(chalk.bgRed("There was an error retrieving the auth token"));
+    log(err);
+  }
+
+  let result;
+
+  try {
+    let response = await fetch(`https://api.personio.de/v1/company/employees`, {
+    method: "GET",
+      headers: { Authorization: `Bearer ${auth.data.token}` },
+    });
+    result = await response.json();
+  } catch (err) {
+    log(chalk.bgRed("There was an error retrieving the employees list"));
+    log(err);
+  }
+
+  if (result.data) {
+    result.data.forEach((employee) => {
+        let attributes = employee.attributes;
+        
+        let newEmployeeNode = {
+            id: createNodeId(`employee-${attributes.id.value.toString()}`),
+            internal: {
+                type: "Employee",
+                contentDigest: createContentDigest(attributes),
+            },
+            employeeId: attributes.id.value,
+            first_name: attributes.first_name.value,
+            last_name: attributes.last_name.value,
+            position: attributes.position.value,
+            profile_picture: attributes.profile_picture.value
+        };
+        
+        createNode(newEmployeeNode);
+    })
+  }
+
+  return result;
+};
