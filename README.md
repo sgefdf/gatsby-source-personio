@@ -12,8 +12,10 @@ module.exports = {
         {
             resolve: 'gatsby-source-personio',
             options: {
-                clientId: 'YOUR_ID',
-                clientSecret: 'YOUR_SECRET'
+                credentials: {
+                    clientId: 'YOUR_ID',
+                    clientSecret: 'YOUR_SECRET'
+                }
             },
         },
     ],
