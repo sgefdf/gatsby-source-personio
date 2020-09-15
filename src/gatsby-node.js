@@ -116,15 +116,15 @@ async function downloadProfilePictures(
 ) {
   Promise.all(
     employees.map(async (employee) => {
-      let fileNodeID;
       if (employee.profile_picture) {
+        let fileNode, fileNodeID;
         const profilePictureCacheKey = `profile-picture-${employee.id}`;
         const cacheProfilePicture = await cache.get(profilePictureCacheKey);
 
         // If we have cached profile picture reuse
         // previously created file node to not try to redownload
         if (cacheProfilePicture) {
-          const fileNode = getNode(cacheProfilePicture.fileNodeID);
+          fileNode = getNode(cacheProfilePicture.fileNodeID);
 
           // check if node still exists in cache
           // it could be removed if image was made private
@@ -141,7 +141,7 @@ async function downloadProfilePictures(
           const token = await getToken(credentials);
 
           try {
-            const fileNode = await createRemoteFileNode({
+            fileNode = await createRemoteFileNode({
               url: employee.profile_picture,
               store,
               cache,
@@ -167,9 +167,10 @@ async function downloadProfilePictures(
             log(err);
           }
         }
+        
+        createParentChildLink({ parent: employee, child: fileNode });
       }
 
-      createParentChildLink(employee, fileNode);
       return employee;
     })
   );
