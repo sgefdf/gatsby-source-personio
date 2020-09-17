@@ -1,7 +1,7 @@
 {
   "name": "gatsby-source-personio",
   "description": "Gatsby JS source plugin for Personio employees API",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "author": "Alexandre Courtiol <alex.courtiol@gmail.com>",
   "dependencies": {
     "@babel/runtime": "^7.11.2",

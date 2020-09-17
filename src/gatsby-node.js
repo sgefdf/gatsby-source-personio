@@ -45,28 +45,19 @@ exports.sourceNodes = async (
   let employees = [];
   if (result.data) {
     result.data.forEach((employee) => {
-      let attributes = employee.attributes;
-
-      let newEmployeeNode = {
+      let employeeNode = {
         internal: {
           type: "Employee",
-          contentDigest: createContentDigest(attributes),
+          contentDigest: createContentDigest(employee),
         },
       };
-
-      Object.keys(attributes).forEach((key) => {
-        if (typeof attributes[key].value === "string")
-          newEmployeeNode[key] = attributes[key].value;
-        else if (attributes[key].value !== null)
-          newEmployeeNode[key] = attributes[key].value.toString();
-      });
-
-      createNode(newEmployeeNode);
-      employees.push(newEmployeeNode);
+      personioParser(employee, employeeNode);
+      createNode(employeeNode);
+      employees.push(employeeNode);
     });
   }
 
-  return await downloadProfilePictures(
+  downloadProfilePictures(
     employees,
     store,
     cache,
@@ -79,7 +70,43 @@ exports.sourceNodes = async (
     reporter,
     credentials
   );
+
+  return employees;
 };
+
+function personioParser(object, node) {
+  if ("attributes" in object) {
+    let attributes = object.attributes;
+
+    Object.keys(attributes).forEach((key) => {
+      const attribute = attributes[key];
+      if (attribute === null) {
+        return;
+      } else if (typeof attribute === "object") {
+        const label = cleanLabel(attribute.label);
+        if (attribute.value === null)
+          return;
+        else if (typeof attribute.value === "string")
+          node[label] = attribute.value;
+        else if (typeof attribute.value === "number")
+          node[label] = attribute.value.toString();
+        else if (typeof attribute.value === "object") {
+          node[label] = {};
+          personioParser(attribute.value, node[label]);
+        }
+      } else {
+        if (typeof attribute === "number")
+          node[key] = attribute.toString();
+        else
+          node[key] = attribute;
+      }
+    });
+  }
+}
+
+function cleanLabel(label) {
+  return label.replace(/[^\w\s]|_/g, "").replace(/\s/g, "_").toLowerCase();
+}
 
 async function getToken(credentials) {
   let token;
@@ -101,7 +128,7 @@ async function getToken(credentials) {
   return token;
 }
 
-async function downloadProfilePictures(
+function downloadProfilePictures(
   employees,
   store,
   cache,
