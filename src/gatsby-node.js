@@ -191,7 +191,9 @@ async function createEmployeeNodes(
           }
         }
         
-        await createParentChildLink({ parent: employeeNode, child: fileNode });
+        if (fileNode) {
+          await createParentChildLink({ parent: employeeNode, child: fileNode });
+        }
       }
     })
   );
