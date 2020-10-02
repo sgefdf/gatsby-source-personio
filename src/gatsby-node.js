@@ -42,36 +42,22 @@ exports.sourceNodes = async (
     log(err);
   }
 
-  let employees = [];
   if (result.data) {
-    result.data.forEach((employee) => {
-      let employeeNode = {
-        internal: {
-          type: "Employee",
-          contentDigest: createContentDigest(employee),
-        },
-      };
-      personioParser(employee, employeeNode);
-      createNode(employeeNode);
-      employees.push(employeeNode);
-    });
+    await createEmployeeNodes(
+      result.data,
+      store,
+      cache,
+      createNode,
+      createNodeId,
+      createParentChildLink,
+      createContentDigest,
+      touchNode,
+      getCache,
+      getNode,
+      reporter,
+      credentials
+    );
   }
-
-  downloadProfilePictures(
-    employees,
-    store,
-    cache,
-    createNode,
-    createNodeId,
-    createParentChildLink,
-    touchNode,
-    getCache,
-    getNode,
-    reporter,
-    credentials
-  );
-
-  return employees;
 };
 
 function personioParser(object, node) {
@@ -128,24 +114,34 @@ async function getToken(credentials) {
   return token;
 }
 
-function downloadProfilePictures(
+async function createEmployeeNodes(
   employees,
   store,
   cache,
   createNode,
   createNodeId,
   createParentChildLink,
+  createContentDigest,
   touchNode,
   getCache,
   getNode,
   reporter,
   credentials,
 ) {
-  Promise.all(
+  await Promise.all(
     employees.map(async (employee) => {
-      if (employee.profile_picture) {
+      let employeeNode = {
+        internal: {
+          type: "Employee",
+          contentDigest: createContentDigest(employee),
+        },
+      };
+      personioParser(employee, employeeNode);
+      await createNode(employeeNode);
+
+      if (employeeNode.profile_picture) {
         let fileNode, fileNodeID;
-        const profilePictureCacheKey = `profile-picture-${employee.id}`;
+        const profilePictureCacheKey = `profile-picture-${employeeNode.id}`;
         const cacheProfilePicture = await cache.get(profilePictureCacheKey);
 
         // If we have cached profile picture reuse
@@ -169,13 +165,13 @@ function downloadProfilePictures(
 
           try {
             fileNode = await createRemoteFileNode({
-              url: employee.profile_picture,
+              url: employeeNode.profile_picture,
               store,
               cache,
               createNode,
               createNodeId,
               getCache,
-              parentNodeId: employee.id,
+              parentNodeId: employeeNode.id,
               reporter,
               httpHeaders: { Authorization: token },
             });
@@ -195,10 +191,8 @@ function downloadProfilePictures(
           }
         }
         
-        createParentChildLink({ parent: employee, child: fileNode });
+        await createParentChildLink({ parent: employeeNode, child: fileNode });
       }
-
-      return employee;
     })
   );
 }

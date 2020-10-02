@@ -1,12 +1,12 @@
 {
   "name": "gatsby-source-personio",
   "description": "Gatsby JS source plugin for Personio employees API",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "Alexandre Courtiol <alex.courtiol@gmail.com>",
   "dependencies": {
     "@babel/runtime": "^7.11.2",
     "chalk": "^4.1.0",
-    "gatsby-source-filesystem": "^2.3.30",
+    "gatsby-source-filesystem": "^2.3.32",
     "node-fetch": "^2.6.1"
   },
   "keywords": [
@@ -36,9 +36,9 @@
     "watch": "babel -w src --out-dir . --ignore \"**/__tests__\""
   },
   "peerDependencies": {
-    "gatsby": "^2.2.0"
+    "gatsby": "^2.2"
   },
   "engines": {
-    "node": ">=10.13.0"
+    "node": ">=12"
   }
 }
