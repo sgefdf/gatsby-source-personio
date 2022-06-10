@@ -14,7 +14,7 @@ exports.sourceNodes = async (
     getCache,
     reporter,
   },
-  { credentials }
+  { credentials, apiUrl }
 ) => {
   log(chalk.black.bgWhite("Starting Personio Source plugin"));
   const { createNode, createParentChildLink, touchNode } = actions;
@@ -29,10 +29,19 @@ exports.sourceNodes = async (
   }
 
   let result;
-  const token = await getToken(credentials);
+  let url = 'https://api.personio.de/v1/company/employees';
+  let token;
+
+  if(apiUrl && !(apiUrl === "")){
+    log(chalk.bgBlue("A different URL has been set, plugin is running in local development mode"));
+    url = apiUrl
+    token = 'justanexampletoken'
+  } else {
+    token = await getToken(credentials);
+  }
 
   try {
-    let response = await fetch(`https://api.personio.de/v1/company/employees`, {
+    let response = await fetch(url, {
       method: "GET",
       headers: { Authorization: token },
     });
@@ -198,3 +207,4 @@ async function createEmployeeNodes(
     })
   );
 }
+
