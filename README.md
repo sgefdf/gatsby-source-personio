@@ -15,7 +15,9 @@ module.exports = {
                 credentials: {
                     clientId: 'YOUR_ID',
                     clientSecret: 'YOUR_SECRET'
-                }
+                },
+              //apiUrl: 'http://localhost'
+              //can be set for local development, defaults to regular Personio API
             },
         },
     ],
